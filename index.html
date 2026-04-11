@@ -1,0 +1,504 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <meta name="description" content="Nick Sumnicht — Senior Research Analyst and data enthusiast. Building analyses and dashboards about healthcare, sports, and whatever comes next." />
+  <title>Nick Sumnicht</title>
+  <link rel="stylesheet" href="css/style.css" />
+</head>
+<body>
+
+  <!-- ============================================================
+       NAVIGATION
+       Fixed to the top of the screen. Stays visible as you scroll.
+       On mobile, the links collapse into a hamburger menu.
+       ============================================================ -->
+  <nav class="nav" role="navigation" aria-label="Main navigation">
+    <div class="nav__inner">
+
+      <!-- Logo: your name, links back to top of page -->
+      <a href="#" class="nav__logo">Nick Sumnicht</a>
+
+      <!-- Desktop links (hidden on mobile, see style.css) -->
+      <ul class="nav__links">
+        <li><a href="#about">About</a></li>
+        <li><a href="#projects">Projects</a></li>
+        <li><a href="#dashboards">Dashboards</a></li>
+        <li><a href="#blog">Blog</a></li>
+        <li><a href="#contact">Contact</a></li>
+        <li><a href="#resume" class="nav__resume-btn">Resume</a></li>
+      </ul>
+
+      <!-- Hamburger button (visible on mobile only) -->
+      <button class="nav__hamburger" aria-label="Toggle menu" aria-expanded="false">
+        <span></span>
+        <span></span>
+        <span></span>
+      </button>
+
+    </div>
+  </nav>
+
+  <!-- Mobile menu drawer (toggled by JS) -->
+  <div class="nav__mobile-menu" role="menu">
+    <a href="#about">About</a>
+    <a href="#projects">Projects</a>
+    <a href="#dashboards">Dashboards</a>
+    <a href="#blog">Blog</a>
+    <a href="#contact">Contact</a>
+    <a href="#resume">Resume</a>
+  </div>
+
+  <!-- ============================================================
+       MAIN CONTENT
+       Sections will be added here one at a time after nav review.
+       ============================================================ -->
+  <main>
+
+    <!-- ============================================================
+         HERO SECTION
+         Full viewport height. Animated gradient background.
+         Name, title, tagline, two CTA buttons, scroll indicator.
+         ============================================================ -->
+    <section class="hero" id="hero">
+      <div class="hero__bg-animation"></div>
+
+      <div class="container hero__content">
+
+        <!-- Eyebrow: small label above the name -->
+        <p class="hero__eyebrow">Hi, I'm</p>
+
+        <!-- Name -->
+        <h1 class="hero__name">Nick Sumnicht</h1>
+
+        <!-- Title -->
+        <p class="hero__title">Data Analyst</p>
+
+        <!-- Tagline -->
+        <p class="hero__tagline">
+          Senior Research Analyst by day. Building analyses and dashboards
+          about whatever I'm obsessed with by night.
+        </p>
+
+        <!-- CTA Buttons -->
+        <div class="hero__ctas">
+          <a href="#projects" class="btn btn--primary">View My Work</a>
+          <a href="#contact" class="btn btn--outline">Get In Touch</a>
+        </div>
+
+      </div>
+
+      <!-- Scroll indicator: bouncing arrow at the bottom -->
+      <a href="#about" class="hero__scroll-indicator" aria-label="Scroll to about section">
+        <span class="hero__scroll-text">scroll</span>
+        <svg xmlns="http://www.w3.org/2000/svg" width="20" height="20" viewBox="0 0 24 24"
+             fill="none" stroke="currentColor" stroke-width="2"
+             stroke-linecap="round" stroke-linejoin="round">
+          <polyline points="6 9 12 15 18 9"></polyline>
+        </svg>
+      </a>
+    </section>
+
+    <!-- ============================================================
+         ABOUT SECTION
+         Two columns: photo left, text right.
+         Stacks to single column on mobile.
+         ============================================================ -->
+    <section class="about" id="about">
+      <div class="container">
+
+        <h2 class="section-title fade-in">About Me</h2>
+
+        <div class="about__grid">
+
+          <!-- Photo: placeholder until real photo is provided -->
+          <div class="about__photo-wrapper fade-in">
+            <div class="about__photo-placeholder">
+              <svg xmlns="http://www.w3.org/2000/svg" width="64" height="64" viewBox="0 0 24 24"
+                   fill="none" stroke="currentColor" stroke-width="1" stroke-linecap="round" stroke-linejoin="round">
+                <path d="M20 21v-2a4 4 0 0 0-4-4H8a4 4 0 0 0-4 4v2"></path>
+                <circle cx="12" cy="7" r="4"></circle>
+              </svg>
+              <p>Photo coming soon</p>
+            </div>
+          </div>
+
+          <!-- Text content -->
+          <div class="about__text fade-in">
+            <p>
+              I'm a Senior Research Analyst at AIR, based in Littleton, Colorado (just south of Denver), which I've called home since 2019 and have zero plans of leaving. I work remotely alongside my wife and our three dogs, Marshall, Milo, and Maestro, which makes for a pretty great office setup.
+            </p>
+            <p>
+              I've spent the past decade in healthcare government contracting, building data visualizations, coding measures and indices, and developing validation pipelines for clients like CMS, CMMI, ACHP, MACPAC, and QSRS. The visualization and validation work is what I genuinely love most, but I'm ready for the next challenge. I want to move into the statistical methodology side of data science and develop measures myself, not just implement them. That's really the whole reason this site exists: to document that journey, the learning, and honestly, the mistakes along the way.
+            </p>
+            <p>
+              When I'm not staring at data, I'm usually outside. I've been rock climbing since high school and got into mountaineering around 2017. Summits so far include Mount Rainier, Mount Adams (twice), Eldorado Peak, and Mount Olympus, with Shasta, Whitney, and Baker still on the list. Away from the mountains, my interests are what I'd call wonderfully eclectic: Formula 1, D&amp;D, Legos, crochet, trashy reality TV, sports statistics, and plenty more that will probably surface as projects accumulate here.
+            </p>
+
+            <!-- Skill tags -->
+            <div class="about__skills">
+              <span class="skill-tag">Python</span>
+              <span class="skill-tag">SQL / PostgreSQL</span>
+              <span class="skill-tag">Tableau</span>
+              <span class="skill-tag">Power BI</span>
+              <span class="skill-tag">Statistical Modeling</span>
+              <span class="skill-tag">ETL Pipelines</span>
+              <span class="skill-tag">Healthcare Data</span>
+              <span class="skill-tag">Bayesian Analysis</span>
+            </div>
+          </div>
+
+        </div>
+      </div>
+    </section>
+
+    <!-- ============================================================
+         PROJECTS SECTION
+         Card grid of current projects. Add new cards here as
+         projects are completed. Status badge colors are controlled
+         in style.css under .badge--complete and .badge--progress.
+         ============================================================ -->
+    <section class="projects" id="projects">
+      <div class="container">
+
+        <h2 class="section-title fade-in">Projects</h2>
+
+        <div class="projects__grid">
+
+          <!-- F1 Driver Performance Index -->
+          <article class="project-card fade-in">
+            <div class="project-card__header">
+              <h3 class="project-card__title">F1 Driver Performance Index</h3>
+              <span class="badge badge--complete">Complete</span>
+            </div>
+            <p class="project-card__desc">
+              <!-- TODO: update this description -->
+              Composite statistical index ranking F1 drivers across eras (1950–2025), adjusting for car performance, era, and teammate context using a 16-indicator Bayesian methodology.
+            </p>
+            <div class="project-card__tags">
+              <span class="tag">Python</span>
+              <span class="tag">PostgreSQL</span>
+              <span class="tag">pandas</span>
+              <span class="tag">Bayesian Analysis</span>
+              <span class="tag">Statistics</span>
+            </div>
+            <div class="project-card__actions">
+              <a href="https://github.com/nsumnicht" class="btn btn--outline btn--sm" target="_blank" rel="noopener">GitHub</a>
+              <a href="#" class="btn btn--outline btn--sm btn--disabled">Coming Soon</a>
+            </div>
+          </article>
+
+          <!-- Healthcare ED Utilization Pipeline -->
+          <article class="project-card fade-in">
+            <div class="project-card__header">
+              <h3 class="project-card__title">Healthcare ED Utilization Pipeline</h3>
+              <span class="badge badge--progress">In Progress</span>
+            </div>
+            <p class="project-card__desc">
+              <!-- TODO: update this description -->
+              End-to-end ELT pipeline linking CDC PLACES, CMS hospital data, Census ACS, and EPA Walkability to analyze what drives emergency department utilization across communities.
+            </p>
+            <div class="project-card__tags">
+              <span class="tag">Python</span>
+              <span class="tag">PostgreSQL</span>
+              <span class="tag">Tableau</span>
+              <span class="tag">CDC</span>
+              <span class="tag">ETL</span>
+            </div>
+            <div class="project-card__actions">
+              <a href="https://github.com/nsumnicht" class="btn btn--outline btn--sm" target="_blank" rel="noopener">GitHub</a>
+              <a href="#" class="btn btn--outline btn--sm btn--disabled">Coming Soon</a>
+            </div>
+          </article>
+
+          <!-- NFL Injury Rate Analysis -->
+          <article class="project-card fade-in">
+            <div class="project-card__header">
+              <h3 class="project-card__title">NFL Injury Rate Analysis</h3>
+              <span class="badge badge--progress">In Progress</span>
+            </div>
+            <p class="project-card__desc">
+              <!-- TODO: update this description -->
+              Statistical investigation into whether playing surface independently affects NFL injury rates, controlling for position, weather, experience, and game context.
+            </p>
+            <div class="project-card__tags">
+              <span class="tag">Python</span>
+              <span class="tag">PostgreSQL</span>
+              <span class="tag">nflreadpy</span>
+              <span class="tag">Sports Analytics</span>
+            </div>
+            <div class="project-card__actions">
+              <a href="https://github.com/nsumnicht" class="btn btn--outline btn--sm" target="_blank" rel="noopener">GitHub</a>
+              <a href="#" class="btn btn--outline btn--sm btn--disabled">Coming Soon</a>
+            </div>
+          </article>
+
+          <!-- More coming soon placeholder -->
+          <article class="project-card project-card--placeholder fade-in">
+            <p class="project-card__placeholder-text">More projects in progress — check back soon.</p>
+          </article>
+
+        </div>
+      </div>
+    </section>
+
+    <!-- ============================================================
+         DASHBOARDS SECTION
+         Placeholder grid for Tableau / Dash embeds. See the
+         portfolio-builder command for Tableau vs Dash embed notes
+         before adding any live embed code here.
+         ============================================================ -->
+    <section class="dashboards" id="dashboards">
+      <div class="container">
+
+        <h2 class="section-title fade-in">Dashboards</h2>
+
+        <div class="dashboards__grid">
+
+          <!-- Placeholder card 1 -->
+          <div class="dashboard-card dashboard-card--placeholder fade-in">
+            <div class="dashboard-card__icon">
+              <svg xmlns="http://www.w3.org/2000/svg" width="32" height="32" viewBox="0 0 24 24"
+                   fill="none" stroke="currentColor" stroke-width="1.5"
+                   stroke-linecap="round" stroke-linejoin="round">
+                <rect x="3" y="3" width="7" height="7"></rect>
+                <rect x="14" y="3" width="7" height="7"></rect>
+                <rect x="3" y="14" width="7" height="7"></rect>
+                <rect x="14" y="14" width="7" height="7"></rect>
+              </svg>
+            </div>
+            <p class="dashboard-card__title">Dashboard Coming Soon</p>
+            <p class="dashboard-card__desc">Interactive visualizations from project work will be embedded here.</p>
+          </div>
+
+          <!-- Placeholder card 2 -->
+          <div class="dashboard-card dashboard-card--placeholder fade-in">
+            <div class="dashboard-card__icon">
+              <svg xmlns="http://www.w3.org/2000/svg" width="32" height="32" viewBox="0 0 24 24"
+                   fill="none" stroke="currentColor" stroke-width="1.5"
+                   stroke-linecap="round" stroke-linejoin="round">
+                <line x1="18" y1="20" x2="18" y2="10"></line>
+                <line x1="12" y1="20" x2="12" y2="4"></line>
+                <line x1="6" y1="20" x2="6" y2="14"></line>
+              </svg>
+            </div>
+            <p class="dashboard-card__title">Dashboard Coming Soon</p>
+            <p class="dashboard-card__desc">Interactive visualizations from project work will be embedded here.</p>
+          </div>
+
+        </div>
+
+        <p class="dashboards__note fade-in">
+          Tableau dashboards and interactive tools will appear here as projects complete.
+        </p>
+
+      </div>
+    </section>
+
+    <!-- ============================================================
+         BLOG SECTION
+         Preview of 3 most recent posts. Full listing lives in
+         blog.html. Add new post preview cards here and in blog.html
+         when a new post is published.
+         ============================================================ -->
+    <section class="blog" id="blog">
+      <div class="container">
+
+        <h2 class="section-title fade-in">Writing</h2>
+
+        <!-- No posts yet: coming soon state -->
+        <div class="blog__coming-soon fade-in">
+          <p class="blog__coming-soon-text">
+            Project writeups and data deep-dives. First post coming soon.
+          </p>
+        </div>
+
+        <!-- TODO: when posts exist, replace the coming-soon block above
+             with a .blog__grid of .blog-card elements (see blog.html for structure) -->
+
+        <div class="blog__footer fade-in">
+          <a href="blog.html" class="btn btn--outline">View All Posts</a>
+        </div>
+
+      </div>
+    </section>
+
+    <!-- ============================================================
+         RESUME SECTION
+         HTML summary of resume for quick scanning. Full PDF lives at
+         assets/resume/nick_sumnicht_resume.pdf — drop it there to
+         activate the download button.
+         ============================================================ -->
+    <section class="resume" id="resume">
+      <div class="container">
+
+        <div class="resume__header fade-in">
+          <h2 class="section-title">Resume</h2>
+          <a href="assets/resume/nick_sumnicht_resume.pdf" class="btn btn--outline" target="_blank" rel="noopener">
+            Download PDF ↓
+          </a>
+        </div>
+
+        <!-- Skills -->
+        <div class="resume__block fade-in">
+          <h3 class="resume__block-title">Core Skills</h3>
+          <div class="resume__skills-grid">
+            <div class="resume__skill-group">
+              <p class="resume__skill-label">Visualization</p>
+              <p class="resume__skill-value">Tableau (10+ yrs), Power BI (5+ yrs), Excel</p>
+            </div>
+            <div class="resume__skill-group">
+              <p class="resume__skill-label">Programming</p>
+              <p class="resume__skill-value">Python (pandas, NumPy, SciPy, Spark), SQL, Databricks</p>
+            </div>
+            <div class="resume__skill-group">
+              <p class="resume__skill-label">Data Engineering</p>
+              <p class="resume__skill-value">PostgreSQL, ETL pipelines, data validation frameworks</p>
+            </div>
+            <div class="resume__skill-group">
+              <p class="resume__skill-label">Domain</p>
+              <p class="resume__skill-value">Healthcare analytics, payment model evaluation, CMS/CMMI data, quality measurement</p>
+            </div>
+          </div>
+        </div>
+
+        <!-- Experience -->
+        <div class="resume__block fade-in">
+          <h3 class="resume__block-title">Experience</h3>
+
+          <div class="resume__job">
+            <div class="resume__job-header">
+              <div>
+                <p class="resume__job-title">Senior Research Analyst</p>
+                <p class="resume__job-company">American Institute for Research (AIR)</p>
+              </div>
+              <span class="resume__job-date">2021 – Present</span>
+            </div>
+            <ul class="resume__job-bullets">
+              <li>Led analytic workflows for healthcare payment models, migrating 30,000+ lines of SAS to Python/Databricks.</li>
+              <li>Verified the Community Deprivation Index (CDI) for a CMS payment model, validating multi-factor calculations impacting hospital reimbursement.</li>
+              <li>Built automated data quality and validation frameworks ensuring accuracy and reproducibility across large healthcare datasets.</li>
+              <li>Designed and maintained Tableau and Power BI dashboards delivering performance metrics to internal teams and external stakeholders including CMS, CMMI, ACHP, MACPAC, and QSRS.</li>
+              <li>Serves as AIR's primary SME on data visualization best practices, training junior staff and guiding teams on impactful data storytelling.</li>
+            </ul>
+          </div>
+
+          <div class="resume__job">
+            <div class="resume__job-header">
+              <div>
+                <p class="resume__job-title">Senior Research Analyst</p>
+                <p class="resume__job-company">IMPAQ International, LLC</p>
+              </div>
+              <span class="resume__job-date">2020 – 2021</span>
+            </div>
+            <ul class="resume__job-bullets">
+              <li>Analyzed CMS healthcare datasets for performance measurement, utilization tracking, and program evaluation.</li>
+              <li>Led migration of reporting workflows from Tableau to Power BI, rebuilding data models and designing DAX measures.</li>
+              <li>Developed public-facing Tableau dashboards on food accessibility, diabetes risk, and COVID-19 clinical trials.</li>
+            </ul>
+          </div>
+
+          <div class="resume__job">
+            <div class="resume__job-header">
+              <div>
+                <p class="resume__job-title">Analyst / Research Analyst</p>
+                <p class="resume__job-company">IMPAQ International, LLC</p>
+              </div>
+              <span class="resume__job-date">2016 – 2020</span>
+            </div>
+            <ul class="resume__job-bullets">
+              <li>Supported healthcare program evaluation through data validation, quality assurance, and performance reporting.</li>
+              <li>Developed interactive dashboards for CMMI reporting 50+ measures across 7 dashboards for stakeholder reporting.</li>
+              <li>Managed a team of 3 QA testers for the Quality Safety and Review System (QSRS) using Agile and Jira.</li>
+            </ul>
+          </div>
+
+        </div>
+
+        <!-- Education -->
+        <div class="resume__block fade-in">
+          <h3 class="resume__block-title">Education</h3>
+          <div class="resume__job-header">
+            <div>
+              <p class="resume__job-title">B.A. Economics, Minor in Mathematics</p>
+              <p class="resume__job-company">Colorado State University</p>
+            </div>
+            <span class="resume__job-date">May 2015</span>
+          </div>
+        </div>
+
+      </div>
+    </section>
+
+    <!-- ============================================================
+         CONTACT SECTION
+         Static — no form. Just email, GitHub, LinkedIn links.
+         Edit the mailto and href values here to update links.
+         ============================================================ -->
+    <section class="contact" id="contact">
+      <div class="container">
+
+        <h2 class="section-title fade-in">Get In Touch</h2>
+
+        <div class="contact__inner fade-in">
+          <p class="contact__intro">
+            I'm always happy to talk data, methodology, F1, or whatever you're building.
+            The best way to reach me is email.
+          </p>
+
+          <div class="contact__links">
+
+            <a href="mailto:nsumnicht@gmail.com" class="contact__link">
+              <svg xmlns="http://www.w3.org/2000/svg" width="20" height="20" viewBox="0 0 24 24"
+                   fill="none" stroke="currentColor" stroke-width="2"
+                   stroke-linecap="round" stroke-linejoin="round">
+                <path d="M4 4h16c1.1 0 2 .9 2 2v12c0 1.1-.9 2-2 2H4c-1.1 0-2-.9-2-2V6c0-1.1.9-2 2-2z"></path>
+                <polyline points="22,6 12,13 2,6"></polyline>
+              </svg>
+              nsumnicht@gmail.com
+            </a>
+
+            <a href="https://github.com/nsumnicht" class="contact__link" target="_blank" rel="noopener">
+              <svg xmlns="http://www.w3.org/2000/svg" width="20" height="20" viewBox="0 0 24 24"
+                   fill="none" stroke="currentColor" stroke-width="2"
+                   stroke-linecap="round" stroke-linejoin="round">
+                <path d="M9 19c-5 1.5-5-2.5-7-3m14 6v-3.87a3.37 3.37 0 0 0-.94-2.61c3.14-.35 6.44-1.54 6.44-7A5.44 5.44 0 0 0 20 4.77 5.07 5.07 0 0 0 19.91 1S18.73.65 16 2.48a13.38 13.38 0 0 0-7 0C6.27.65 5.09 1 5.09 1A5.07 5.07 0 0 0 5 4.77a5.44 5.44 0 0 0-1.5 3.78c0 5.42 3.3 6.61 6.44 7A3.37 3.37 0 0 0 9 18.13V22"></path>
+              </svg>
+              github.com/nsumnicht
+            </a>
+
+            <a href="https://linkedin.com/in/nicholassumnicht" class="contact__link" target="_blank" rel="noopener">
+              <svg xmlns="http://www.w3.org/2000/svg" width="20" height="20" viewBox="0 0 24 24"
+                   fill="none" stroke="currentColor" stroke-width="2"
+                   stroke-linecap="round" stroke-linejoin="round">
+                <path d="M16 8a6 6 0 0 1 6 6v7h-4v-7a2 2 0 0 0-2-2 2 2 0 0 0-2 2v7h-4v-7a6 6 0 0 1 6-6z"></path>
+                <rect x="2" y="9" width="4" height="12"></rect>
+                <circle cx="4" cy="4" r="2"></circle>
+              </svg>
+              linkedin.com/in/nicholassumnicht
+            </a>
+
+          </div>
+        </div>
+
+      </div>
+    </section>
+
+    <!-- ============================================================
+         FOOTER
+         Minimal. Name, year, personality. No section ID needed.
+         ============================================================ -->
+    <footer class="footer">
+      <div class="container footer__inner">
+        <p class="footer__name">Nick Sumnicht</p>
+        <p class="footer__note">Built with HTML, CSS, and JavaScript. No frameworks were harmed.</p>
+        <p class="footer__copy">&copy; <span id="footer-year"></span></p>
+      </div>
+    </footer>
+
+  </main>
+
+  <script src="js/script.js"></script>
+</body>
+</html>

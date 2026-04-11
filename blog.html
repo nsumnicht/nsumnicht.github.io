@@ -1,0 +1,93 @@
+<!DOCTYPE html>
+<!-- blog.html — Full post listing page. Add new .blog-card entries here
+     (and a preview card in index.html) each time a new post is published. -->
+<html lang="en">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <meta name="description" content="Writing by Nick Sumnicht — project writeups, data deep-dives, and things figured out the hard way." />
+  <title>Writing — Nick Sumnicht</title>
+  <link rel="stylesheet" href="css/style.css" />
+</head>
+<body>
+
+  <!-- Nav: identical to index.html — update both if nav changes -->
+  <nav class="nav" role="navigation" aria-label="Main navigation">
+    <div class="nav__inner">
+      <a href="index.html" class="nav__logo">Nick Sumnicht</a>
+      <ul class="nav__links">
+        <li><a href="index.html#about">About</a></li>
+        <li><a href="index.html#projects">Projects</a></li>
+        <li><a href="index.html#dashboards">Dashboards</a></li>
+        <li><a href="blog.html" class="active">Blog</a></li>
+        <li><a href="index.html#contact">Contact</a></li>
+        <li><a href="assets/resume/nick_sumnicht_resume.pdf" class="nav__resume-btn" target="_blank" rel="noopener">Resume</a></li>
+      </ul>
+      <button class="nav__hamburger" aria-label="Toggle menu" aria-expanded="false">
+        <span></span>
+        <span></span>
+        <span></span>
+      </button>
+    </div>
+  </nav>
+
+  <div class="nav__mobile-menu" role="menu">
+    <a href="index.html#about">About</a>
+    <a href="index.html#projects">Projects</a>
+    <a href="index.html#dashboards">Dashboards</a>
+    <a href="blog.html">Blog</a>
+    <a href="index.html#contact">Contact</a>
+    <a href="assets/resume/nick_sumnicht_resume.pdf" target="_blank" rel="noopener">Resume ↗</a>
+  </div>
+
+  <main class="blog-page">
+    <div class="container">
+
+      <!-- Page header -->
+      <div class="blog-page__header">
+        <h1 class="blog-page__title">Writing</h1>
+        <p class="blog-page__subtitle">
+          Project writeups, data deep-dives, and things I figured out the hard way.
+        </p>
+      </div>
+
+      <!-- Coming soon state — replace this block with .blog-page__grid when posts exist -->
+      <div class="blog-page__empty">
+        <p class="blog-page__empty-text">First post coming soon.</p>
+        <a href="index.html" class="btn btn--outline">← Back to Home</a>
+      </div>
+
+      <!-- POST GRID — uncomment and populate when posts exist
+      <div class="blog-page__grid">
+
+        <article class="blog-card">
+          <span class="blog-card__category">Sports Analytics</span>
+          <h2 class="blog-card__title">
+            <a href="posts/your-post-slug.html">Post Title Here</a>
+          </h2>
+          <p class="blog-card__excerpt">
+            Two to three sentence excerpt describing what the post covers.
+          </p>
+          <div class="blog-card__footer">
+            <span class="blog-card__meta">April 9, 2026 · 8 min read</span>
+            <a href="posts/your-post-slug.html" class="blog-card__link">Read more →</a>
+          </div>
+        </article>
+
+      </div>
+      -->
+
+    </div>
+  </main>
+
+  <footer class="footer">
+    <div class="container footer__inner">
+      <p class="footer__name">Nick Sumnicht</p>
+      <p class="footer__note">Built with HTML, CSS, and JavaScript. No frameworks were harmed.</p>
+      <p class="footer__copy">&copy; <span id="footer-year"></span></p>
+    </div>
+  </footer>
+
+  <script src="js/script.js"></script>
+</body>
+</html>

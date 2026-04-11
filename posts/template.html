@@ -1,0 +1,112 @@
+<!DOCTYPE html>
+<!-- posts/template.html — Copy this file to posts/your-post-slug.html for each new post.
+     Update the 5 TODO items at the top, then write the post body in .post__body. -->
+<html lang="en">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <!-- TODO: update title and description for each post -->
+  <meta name="description" content="Post description here." />
+  <title>Post Title — Nick Sumnicht</title>
+  <link rel="stylesheet" href="../css/style.css" />
+  <!-- highlight.js for code syntax highlighting -->
+  <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/highlight.js/11.9.0/styles/github-dark.min.css" />
+</head>
+<body>
+
+  <!-- Nav: keep identical to index.html — update all nav blocks if nav changes -->
+  <nav class="nav" role="navigation" aria-label="Main navigation">
+    <div class="nav__inner">
+      <a href="../index.html" class="nav__logo">Nick Sumnicht</a>
+      <ul class="nav__links">
+        <li><a href="../index.html#about">About</a></li>
+        <li><a href="../index.html#projects">Projects</a></li>
+        <li><a href="../index.html#dashboards">Dashboards</a></li>
+        <li><a href="../blog.html">Blog</a></li>
+        <li><a href="../index.html#contact">Contact</a></li>
+        <li><a href="../assets/resume/nick_sumnicht_resume.pdf" class="nav__resume-btn" target="_blank" rel="noopener">Resume</a></li>
+      </ul>
+      <button class="nav__hamburger" aria-label="Toggle menu" aria-expanded="false">
+        <span></span>
+        <span></span>
+        <span></span>
+      </button>
+    </div>
+  </nav>
+
+  <div class="nav__mobile-menu" role="menu">
+    <a href="../index.html#about">About</a>
+    <a href="../index.html#projects">Projects</a>
+    <a href="../index.html#dashboards">Dashboards</a>
+    <a href="../blog.html">Blog</a>
+    <a href="../index.html#contact">Contact</a>
+    <a href="../assets/resume/nick_sumnicht_resume.pdf" target="_blank" rel="noopener">Resume ↗</a>
+  </div>
+
+  <main class="post-page">
+    <div class="container">
+
+      <a href="../blog.html" class="post__back">← Back to all posts</a>
+
+      <header>
+        <!-- TODO: update category (options: Data Engineering, Sports Analytics,
+             Healthcare Data, Statistics & Methodology, Game Dev, General) -->
+        <p class="post__category">Sports Analytics</p>
+
+        <!-- TODO: update title -->
+        <h1 class="post__title">Post Title Goes Here</h1>
+
+        <!-- TODO: update date and read time (approx word count / 200) -->
+        <p class="post__meta">Nick Sumnicht &nbsp;·&nbsp; April 9, 2026 &nbsp;·&nbsp; 5 min read</p>
+      </header>
+
+      <!-- TODO: write the post here. Use standard HTML:
+           <h2> for section headers, <h3> for sub-sections,
+           <p> for paragraphs, <ul>/<ol> for lists,
+           <blockquote> for callouts, <code> for inline code,
+           <pre><code class="language-python"> for code blocks -->
+      <article class="post__body">
+
+        <p>
+          Opening paragraph here. Lead with the interesting thing, not the setup.
+        </p>
+
+        <h2>Section Header</h2>
+
+        <p>
+          Body text here.
+        </p>
+
+        <pre><code class="language-python"># Example code block
+def example():
+    return "highlight.js will color this automatically"
+</code></pre>
+
+        <p>
+          Closing paragraph — end with what you learned or what comes next.
+        </p>
+
+      </article>
+
+      <!-- Bottom back link -->
+      <footer class="post__footer">
+        <a href="../blog.html" class="post__back">← Back to all posts</a>
+      </footer>
+
+    </div>
+  </main>
+
+  <footer class="footer">
+    <div class="container footer__inner">
+      <p class="footer__name">Nick Sumnicht</p>
+      <p class="footer__note">Built with HTML, CSS, and JavaScript. No frameworks were harmed.</p>
+      <p class="footer__copy">&copy; <span id="footer-year"></span></p>
+    </div>
+  </footer>
+
+  <script src="../js/script.js"></script>
+  <!-- highlight.js: automatically colors any <code class="language-*"> blocks -->
+  <script src="https://cdnjs.cloudflare.com/ajax/libs/highlight.js/11.9.0/highlight.min.js"></script>
+  <script>hljs.highlightAll();</script>
+</body>
+</html>
