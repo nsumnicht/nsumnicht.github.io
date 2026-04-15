@@ -11,6 +11,8 @@
 /* --- CSS Custom Properties (variables) --- */
 :root {
   /* Colors */
+  /* TODO: background greys may be too light — revisit once site has real content/photos.
+     bg-secondary (#928E85) and bg-tertiary (#9D9490) are the likely candidates to darken. */
   --bg-primary:    #726E6D;
   --bg-secondary:  #928E85;
   --bg-tertiary:   #9D9490;

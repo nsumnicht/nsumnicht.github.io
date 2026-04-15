@@ -184,8 +184,8 @@
               <span class="tag">Statistics</span>
             </div>
             <div class="project-card__actions">
-              <a href="https://github.com/nsumnicht" class="btn btn--outline btn--sm" target="_blank" rel="noopener">GitHub</a>
-              <a href="#" class="btn btn--outline btn--sm btn--disabled">Coming Soon</a>
+              <a href="https://github.com/nsumnicht/projects/blob/main/f1/notebooks/01_dpi_analysis.ipynb" class="btn btn--outline btn--sm" target="_blank" rel="noopener">Notebook</a>
+              <a href="posts/f1-driver-performance-index.html" class="btn btn--outline btn--sm">Blog Post</a>
             </div>
           </article>
 
@@ -307,15 +307,23 @@
 
         <h2 class="section-title fade-in">Writing</h2>
 
-        <!-- No posts yet: coming soon state -->
-        <div class="blog__coming-soon fade-in">
-          <p class="blog__coming-soon-text">
-            Project writeups and data deep-dives. First post coming soon.
-          </p>
-        </div>
+        <div class="blog__grid fade-in">
 
-        <!-- TODO: when posts exist, replace the coming-soon block above
-             with a .blog__grid of .blog-card elements (see blog.html for structure) -->
+          <article class="blog-card">
+            <span class="blog-card__category">Sports Analytics</span>
+            <h2 class="blog-card__title">
+              <a href="posts/f1-driver-performance-index.html">Building the F1 Driver Performance Index</a>
+            </h2>
+            <p class="blog-card__excerpt">
+              How I built a 16-indicator Bayesian index to rank every F1 driver from 1950 to 2025 — era-adjusted z-scores, Bayesian shrinkage, bootstrap confidence intervals, and why the answer is more complicated than you'd think.
+            </p>
+            <div class="blog-card__footer">
+              <span class="blog-card__meta">April 15, 2026 &nbsp;·&nbsp; 8 min read</span>
+              <a href="posts/f1-driver-performance-index.html" class="blog-card__link">Read more →</a>
+            </div>
+          </article>
+
+        </div>
 
         <div class="blog__footer fade-in">
           <a href="blog.html" class="btn btn--outline">View All Posts</a>

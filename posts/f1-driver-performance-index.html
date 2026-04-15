@@ -1,0 +1,756 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <meta name="description" content="How I built a 16-indicator Bayesian index to rank every F1 driver from 1950 to 2025 and why the answer is more complicated than you would think." />
+  <title>Building the F1 Driver Performance Index — Nick Sumnicht</title>
+  <link rel="stylesheet" href="../css/style.css" />
+  <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/highlight.js/11.9.0/styles/github-dark.min.css" />
+  <style>
+    .indicator {
+      margin: 2.5rem 0;
+      padding: 1.5rem;
+      background: rgba(255,255,255,0.04);
+      border: 1px solid var(--border);
+      border-radius: 8px;
+    }
+    .indicator__header {
+      display: flex;
+      align-items: baseline;
+      gap: 0.75rem;
+      margin-bottom: 0.5rem;
+    }
+    .indicator__num {
+      font-size: 0.75rem;
+      font-weight: 700;
+      letter-spacing: 0.08em;
+      text-transform: uppercase;
+      color: var(--accent);
+      white-space: nowrap;
+    }
+    .indicator__name {
+      font-size: 1.1rem;
+      font-weight: 700;
+      color: var(--text-primary);
+      margin: 0;
+    }
+    .indicator__formula {
+      font-family: 'JetBrains Mono', 'Fira Code', monospace;
+      font-size: 0.82rem;
+      color: var(--accent);
+      background: rgba(64,224,208,0.08);
+      border: 1px solid rgba(64,224,208,0.2);
+      border-radius: 4px;
+      padding: 0.35rem 0.65rem;
+      display: inline-block;
+      margin: 0.4rem 0 0.75rem;
+    }
+    .indicator__desc {
+      font-size: 0.95rem;
+      color: var(--text-secondary);
+      margin: 0 0 1rem;
+      line-height: 1.6;
+    }
+    .indicator__note {
+      font-size: 0.82rem;
+      color: var(--text-secondary);
+      font-style: italic;
+      margin-top: 0.5rem;
+      opacity: 0.8;
+    }
+    .dpi-table {
+      width: 100%;
+      border-collapse: collapse;
+      font-size: 0.88rem;
+    }
+    .dpi-table th {
+      text-align: left;
+      padding: 0.4rem 0.75rem;
+      color: var(--text-secondary);
+      font-weight: 600;
+      font-size: 0.75rem;
+      text-transform: uppercase;
+      letter-spacing: 0.06em;
+      border-bottom: 1px solid var(--border);
+    }
+    .dpi-table td {
+      padding: 0.4rem 0.75rem;
+      color: var(--text-primary);
+      border-bottom: 1px solid rgba(48,54,61,0.5);
+    }
+    .dpi-table tr:last-child td { border-bottom: none; }
+    .dpi-table .rank { color: var(--accent); font-weight: 700; width: 2rem; }
+    .dpi-table .score { text-align: right; font-family: 'JetBrains Mono', monospace; color: var(--accent); }
+    .section-divider { border: none; border-top: 1px solid var(--border); margin: 3rem 0; }
+    .final-table-wrap { overflow-x: auto; }
+    .final-table {
+      width: 100%;
+      border-collapse: collapse;
+      font-size: 0.88rem;
+      min-width: 520px;
+    }
+    .final-table th {
+      text-align: left;
+      padding: 0.5rem 1rem;
+      color: var(--text-secondary);
+      font-size: 0.75rem;
+      text-transform: uppercase;
+      letter-spacing: 0.06em;
+      border-bottom: 2px solid var(--border);
+      white-space: nowrap;
+    }
+    .final-table td {
+      padding: 0.5rem 1rem;
+      border-bottom: 1px solid rgba(48,54,61,0.5);
+      color: var(--text-primary);
+    }
+    .final-table tr:last-child td { border-bottom: none; }
+    .final-table .f-rank { color: var(--accent); font-weight: 700; width: 2.5rem; }
+    .final-table .f-dpi { text-align: right; font-family: 'JetBrains Mono', monospace; font-weight: 600; color: var(--accent); }
+    .final-table .f-ci { text-align: right; font-family: 'JetBrains Mono', monospace; font-size: 0.8rem; color: var(--text-secondary); }
+    .final-table tr.tier-break td { border-top: 2px dashed rgba(64,224,208,0.3); }
+    .tier-label {
+      font-size: 0.78rem;
+      font-weight: 700;
+      text-transform: uppercase;
+      letter-spacing: 0.08em;
+      color: var(--accent);
+      margin: 2rem 0 0.5rem;
+    }
+  </style>
+</head>
+<body>
+
+  <nav class="nav" role="navigation" aria-label="Main navigation">
+    <div class="nav__inner">
+      <a href="../index.html" class="nav__logo">Nick Sumnicht</a>
+      <ul class="nav__links">
+        <li><a href="../index.html#about">About</a></li>
+        <li><a href="../index.html#projects">Projects</a></li>
+        <li><a href="../index.html#dashboards">Dashboards</a></li>
+        <li><a href="../blog.html">Blog</a></li>
+        <li><a href="../index.html#contact">Contact</a></li>
+        <li><a href="../assets/resume/nick_sumnicht_resume.pdf" class="nav__resume-btn" target="_blank" rel="noopener">Resume</a></li>
+      </ul>
+      <button class="nav__hamburger" aria-label="Toggle menu" aria-expanded="false">
+        <span></span><span></span><span></span>
+      </button>
+    </div>
+  </nav>
+
+  <div class="nav__mobile-menu" role="menu">
+    <a href="../index.html#about">About</a>
+    <a href="../index.html#projects">Projects</a>
+    <a href="../index.html#dashboards">Dashboards</a>
+    <a href="../blog.html">Blog</a>
+    <a href="../index.html#contact">Contact</a>
+    <a href="../assets/resume/nick_sumnicht_resume.pdf" target="_blank" rel="noopener">Resume ↗</a>
+  </div>
+
+  <main class="post-page">
+    <div class="container">
+
+      <a href="../blog.html" class="post__back">← Back to all posts</a>
+
+      <header>
+        <p class="post__category">Sports Analytics</p>
+        <h1 class="post__title">Building the F1 Driver Performance Index</h1>
+        <p class="post__meta">Nick Sumnicht &nbsp;·&nbsp; April 15, 2026 &nbsp;·&nbsp; 12 min read</p>
+      </header>
+
+      <article class="post__body">
+
+        <p>
+          Ask any Formula 1 fan who the greatest driver of all time is and you will get a different answer depending on who you ask, and usually a heated argument to go along with it. Someone throws out Hamilton's record 103 wins. Someone counters with Schumacher's five consecutive titles. Someone else brings up Senna's raw qualifying speed or Fangio's five championships in an era where finishing a race alive was genuinely not guaranteed. Then there is Max Verstappen, who just won three consecutive titles faster than anyone in history.
+        </p>
+
+        <p>
+          The problem with all of these arguments is that they rely on cherry picked statistics, nostalgia, recency bias, or pure vibes. I wanted to see if I could do better and build something rigorous enough to hold up to scrutiny but honest enough to admit what it cannot answer.
+        </p>
+
+        <p>
+          The result is the F1 Driver Performance Index (DPI): a composite statistical index that scores every driver across every season from 1950 to 2025 using 16 indicators, era adjusted z scores, Bayesian shrinkage, and bootstrap confidence intervals. Below is how it is built, what each indicator measures, and who lands on top.
+        </p>
+
+        <h2>The Core Problem: Comparing Across Eras</h2>
+
+        <p>
+          The biggest challenge in any cross era comparison is that the sport looks completely different depending on which decade you are looking at. In 1955, Fangio competed in roughly eight races. In 2024, Verstappen competed in twenty four. Point systems have changed multiple times. Car reliability has gone from "will it finish the race" to nearly guaranteed barring strategy errors. Dominant constructor eras including Ferrari in the early 2000s, Red Bull from 2010 to 2013 and again 2021 to 2023, and Mercedes through most of the hybrid era mean that raw performance statistics tell you as much about the car as they do the driver.
+        </p>
+
+        <p>
+          My solution was to never compare a 1955 driver directly to a 2024 driver on raw numbers. Instead, every indicator is calculated as a rate or a percentile, then z scored <em>within season</em>. A z score answers the question: how many standard deviations above or below their peers was this driver in this specific season? That way, Fangio's 1954 dominance and Verstappen's 2023 dominance are measured on the same scale relative to the field they were actually racing against.
+        </p>
+
+        <h2>Bayesian Shrinkage: Handling Small Samples</h2>
+
+        <p>
+          One issue with z scores is that they are unreliable for small samples. A driver who wins their only two races of a season has a 100% win rate, but that is almost certainly noise rather than signal. Bayesian shrinkage fixes this by pulling small sample estimates toward the mean. The weight applied to a driver's observed score scales with how many races they ran:
+        </p>
+
+        <pre><code class="language-python">K_SMOOTHING = 10
+
+w = races_entered / (races_entered + K_SMOOTHING)
+z_shrunk = w * z_observed
+</code></pre>
+
+        <p>
+          With K=10, a driver with 2 races gets a weight of 0.17, so their score is pulled 83% toward zero. A driver with 20 races gets 0.67. By a full modern season the shrinkage is mild enough to barely matter, which is exactly the behavior you want.
+        </p>
+
+        <h2>PCA vs. Expert Weights</h2>
+
+        <p>
+          I combined the 16 indicators into a single season DPI using two methods: Principal Component Analysis (PCA), which lets the data decide the weights automatically, and expert weights I set myself based on what I believed should matter most in F1.
+        </p>
+
+        <p>
+          The correlation between the two methods came back at <strong>0.937</strong>, meaning they broadly agree on the hierarchy. But the PCA tended to reward drivers on dominant cars more than expert weights did, because raw performance indicators like wins, podiums, and points are highly correlated and PCA amplifies that. Drivers like Bottas 2019 or Pérez 2021 ranked much higher under PCA than under expert weights because they accumulated strong numbers in top tier machinery while consistently being outperformed by their teammates. Expert weights, which emphasize car adjusted metrics like WAR and teammate H2H, are the primary method for exactly that reason.
+        </p>
+
+        <h2>Bootstrap Confidence Intervals</h2>
+
+        <p>
+          I ran 1,000 bootstrap simulations per driver: randomly resampling their season DPIs with replacement and recalculating career scores each time to generate 95% confidence intervals. If two drivers' ranges overlap, we cannot confidently say one is better than the other.
+        </p>
+
+        <hr class="section-divider" />
+
+        <h2>The 16 Indicators</h2>
+
+        <p>
+          Each indicator below is a season level score: one value per driver per year. They are z scored within season and Bayesian shrunk before being combined into the final DPI. Top 10 lists show the best single season performances in the dataset (1950 to 2025) unless otherwise noted.
+        </p>
+
+        <!-- ── INDICATOR 1 ── -->
+        <div class="indicator">
+          <div class="indicator__header">
+            <span class="indicator__num">Indicator 1</span>
+            <h3 class="indicator__name">Win Rate</h3>
+          </div>
+          <code class="indicator__formula">win_rate = wins / sum(race_weight)</code>
+          <p class="indicator__desc">
+            The most intuitive measure of dominance. Rather than raw wins, we divide by a DNF adjusted race count. Mechanical retirements reduce the denominator while driver fault crashes do not. This prevents penalizing drivers for unreliable machinery while still holding them accountable for their own errors.
+          </p>
+          <table class="dpi-table">
+            <thead><tr><th>#</th><th>Driver</th><th>Season</th><th class="score">Win Rate</th></tr></thead>
+            <tbody>
+              <tr><td class="rank">1</td><td>Ascari</td><td>1952</td><td class="score">92.3%</td></tr>
+              <tr><td class="rank">2</td><td>Clark</td><td>1965</td><td class="score">88.9%</td></tr>
+              <tr><td class="rank">3</td><td>Verstappen</td><td>2023</td><td class="score">86.4%</td></tr>
+              <tr><td class="rank">4</td><td>Fangio</td><td>1955</td><td class="score">76.2%</td></tr>
+              <tr><td class="rank">5</td><td>Clark</td><td>1963</td><td class="score">75.7%</td></tr>
+              <tr><td class="rank">6</td><td>Fangio</td><td>1950</td><td class="score">75.0%</td></tr>
+              <tr><td class="rank">7</td><td>Fangio</td><td>1954</td><td class="score">75.0%</td></tr>
+              <tr><td class="rank">8</td><td>Brabham</td><td>1960</td><td class="score">74.1%</td></tr>
+              <tr><td class="rank">9</td><td>Rindt</td><td>1970</td><td class="score">74.1%</td></tr>
+              <tr><td class="rank">10</td><td>Schumacher</td><td>2004</td><td class="score">73.2%</td></tr>
+            </tbody>
+          </table>
+        </div>
+
+        <!-- ── INDICATOR 2 ── -->
+        <div class="indicator">
+          <div class="indicator__header">
+            <span class="indicator__num">Indicator 2</span>
+            <h3 class="indicator__name">Podium Rate</h3>
+          </div>
+          <code class="indicator__formula">podium_rate = top_3_finishes / sum(race_weight)</code>
+          <p class="indicator__desc">
+            Same structure as win rate but counting top 3 finishes. Captures consistent front running performance. A driver who finishes P2 or P3 every weekend is still performing at an elite level even without winning. Uses the same DNF adjusted denominator.
+          </p>
+          <table class="dpi-table">
+            <thead><tr><th>#</th><th>Driver</th><th>Season</th><th class="score">Podium Rate</th></tr></thead>
+            <tbody>
+              <tr><td class="rank">1</td><td>Schumacher</td><td>2002</td><td class="score">100.0%</td></tr>
+              <tr><td class="rank">2</td><td>Clark</td><td>1963</td><td class="score">97.3%</td></tr>
+              <tr><td class="rank">3</td><td>Fangio</td><td>1957</td><td class="score">96.0%</td></tr>
+              <tr><td class="rank">4</td><td>Verstappen</td><td>2023</td><td class="score">95.5%</td></tr>
+              <tr><td class="rank">5</td><td>Fangio</td><td>1955</td><td class="score">95.2%</td></tr>
+              <tr><td class="rank">6</td><td>González</td><td>1951</td><td class="score">95.2%</td></tr>
+              <tr><td class="rank">7</td><td>Prost</td><td>1988</td><td class="score">94.9%</td></tr>
+              <tr><td class="rank">8</td><td>Hamilton</td><td>2014</td><td class="score">94.1%</td></tr>
+              <tr><td class="rank">9</td><td>Hamilton</td><td>2015</td><td class="score">93.2%</td></tr>
+              <tr><td class="rank">10</td><td>Ascari</td><td>1952</td><td class="score">92.3%</td></tr>
+            </tbody>
+          </table>
+        </div>
+
+        <!-- ── INDICATOR 3 ── -->
+        <div class="indicator">
+          <div class="indicator__header">
+            <span class="indicator__num">Indicator 3</span>
+            <h3 class="indicator__name">Points Per Race — Era Normalized</h3>
+          </div>
+          <code class="indicator__formula">points_pct = points_scored / max_points_that_race</code>
+          <p class="indicator__desc">
+            Raw points are meaningless across eras because the scoring system has changed multiple times. This indicator converts each race's points to a percentage of the maximum possible (the winner's score) to remove the scale difference between point systems, then z scores within season to adjust for field competitiveness. A driver who scored full points every race would have a score of 1.0.
+          </p>
+          <table class="dpi-table">
+            <thead><tr><th>#</th><th>Driver</th><th>Season</th><th class="score">Points/Race</th></tr></thead>
+            <tbody>
+              <tr><td class="rank">1</td><td>Verstappen</td><td>2023</td><td class="score">94.9%</td></tr>
+              <tr><td class="rank">2</td><td>Ascari</td><td>1952</td><td class="score">92.3%</td></tr>
+              <tr><td class="rank">3</td><td>Fangio</td><td>1955</td><td class="score">91.3%</td></tr>
+              <tr><td class="rank">4</td><td>Clark</td><td>1965</td><td class="score">88.9%</td></tr>
+              <tr><td class="rank">5</td><td>Clark</td><td>1963</td><td class="score">87.7%</td></tr>
+              <tr><td class="rank">6</td><td>Vettel</td><td>2013</td><td class="score">87.0%</td></tr>
+              <tr><td class="rank">7</td><td>Fangio</td><td>1957</td><td class="score">86.7%</td></tr>
+              <tr><td class="rank">8</td><td>Fangio</td><td>1954</td><td class="score">86.1%</td></tr>
+              <tr><td class="rank">9</td><td>Hamilton</td><td>2020</td><td class="score">85.6%</td></tr>
+              <tr><td class="rank">10</td><td>Vettel</td><td>2011</td><td class="score">84.8%</td></tr>
+            </tbody>
+          </table>
+        </div>
+
+        <!-- ── INDICATOR 4 ── -->
+        <div class="indicator">
+          <div class="indicator__header">
+            <span class="indicator__num">Indicator 4</span>
+            <h3 class="indicator__name">Fastest Lap Performance</h3>
+          </div>
+          <code class="indicator__formula">fastest_lap_pct = 1 − (rank − 1) / (field_size − 1)</code>
+          <p class="indicator__desc">
+            How a driver's single lap race pace compares to the field. Rank 1 (fastest lap of the race) becomes a percentile of 1.0 and last place becomes 0.0. Weighted lower than other indicators because fastest laps are sometimes tactical — teams occasionally pit a driver for soft tyres at the end of a race specifically to steal the fastest lap bonus point. Data is available from 1994 onward only.
+          </p>
+          <table class="dpi-table">
+            <thead><tr><th>#</th><th>Driver</th><th>Season</th><th class="score">FL Percentile</th></tr></thead>
+            <tbody>
+              <tr><td class="rank">1</td><td>Schumacher</td><td>2004</td><td class="score">97.1%</td></tr>
+              <tr><td class="rank">2</td><td>Räikkönen</td><td>2008</td><td class="score">95.2%</td></tr>
+              <tr><td class="rank">3</td><td>Räikkönen</td><td>2005</td><td class="score">94.0%</td></tr>
+              <tr><td class="rank">4</td><td>Schumacher</td><td>2006</td><td class="score">93.1%</td></tr>
+              <tr><td class="rank">5</td><td>Verstappen</td><td>2023</td><td class="score">92.3%</td></tr>
+              <tr><td class="rank">6</td><td>Alonso</td><td>2007</td><td class="score">92.2%</td></tr>
+              <tr><td class="rank">7</td><td>Hamilton</td><td>2015</td><td class="score">91.7%</td></tr>
+              <tr><td class="rank">8</td><td>Hamilton</td><td>2020</td><td class="score">91.4%</td></tr>
+              <tr><td class="rank">9</td><td>Räikkönen</td><td>2007</td><td class="score">90.2%</td></tr>
+              <tr><td class="rank">10</td><td>Verstappen</td><td>2021</td><td class="score">90.0%</td></tr>
+            </tbody>
+          </table>
+        </div>
+
+        <!-- ── INDICATOR 5 ── -->
+        <div class="indicator">
+          <div class="indicator__header">
+            <span class="indicator__num">Indicator 5</span>
+            <h3 class="indicator__name">Teammate H2H — Qualifying</h3>
+          </div>
+          <code class="indicator__formula">quali_h2h = qualifying_wins / pairwise_comparisons</code>
+          <p class="indicator__desc">
+            What percentage of the time did a driver out qualify their teammate? This is one of the purest car controlled signals in the data: both drivers in a team run identical machinery, so if you consistently out qualify your teammate that difference is almost entirely down to the driver. For teams with three or more drivers (common pre 1986), all pairwise comparisons are calculated so the metric is consistent across different team structures.
+          </p>
+          <p class="indicator__note">Many drivers achieved a perfect 100% H2H rate in qualifying for a given season. The table below shows seasons with at least 10 pairwise comparisons. Notable perfect seasons include Häkkinen 1994 against Brundle, Schumacher 1994 against Herbert and Lehto, and Verstappen's dominant 2020 season against Albon.</p>
+          <table class="dpi-table">
+            <thead><tr><th>#</th><th>Driver</th><th>Season</th><th class="score">H2H Rate</th></tr></thead>
+            <tbody>
+              <tr><td class="rank">1</td><td>Häkkinen</td><td>1994</td><td class="score">100.0%</td></tr>
+              <tr><td class="rank">2</td><td>Schumacher</td><td>1994</td><td class="score">100.0%</td></tr>
+              <tr><td class="rank">3</td><td>Verstappen</td><td>2020</td><td class="score">100.0%</td></tr>
+              <tr><td class="rank">4</td><td>Verstappen</td><td>2025</td><td class="score">100.0%</td></tr>
+              <tr><td class="rank">5</td><td>Alonso</td><td>2008</td><td class="score">100.0%</td></tr>
+              <tr><td class="rank">6</td><td>Alonso</td><td>2018</td><td class="score">100.0%</td></tr>
+              <tr><td class="rank">7</td><td>Alonso</td><td>2025</td><td class="score">100.0%</td></tr>
+              <tr><td class="rank">8</td><td>Frentzen</td><td>1995</td><td class="score">100.0%</td></tr>
+              <tr><td class="rank">9</td><td>Herbert</td><td>1997</td><td class="score">100.0%</td></tr>
+              <tr><td class="rank">10</td><td>Albon</td><td>2023</td><td class="score">100.0%</td></tr>
+            </tbody>
+          </table>
+        </div>
+
+        <!-- ── INDICATOR 6 ── -->
+        <div class="indicator">
+          <div class="indicator__header">
+            <span class="indicator__num">Indicator 6</span>
+            <h3 class="indicator__name">Teammate H2H — Race</h3>
+          </div>
+          <code class="indicator__formula">race_h2h = race_wins_vs_teammate / pairwise_comparisons</code>
+          <p class="indicator__desc">
+            Same concept as qualifying H2H but for race finishing positions. Controls for car performance across full race distances rather than a single flying lap. Race H2H is weighted more heavily than qualifying H2H because race pace includes tyre management, racecraft, and decision making under pressure and not just outright speed.
+          </p>
+          <table class="dpi-table">
+            <thead><tr><th>#</th><th>Driver</th><th>Season</th><th class="score">H2H Rate</th></tr></thead>
+            <tbody>
+              <tr><td class="rank">1</td><td>Ascari</td><td>1952</td><td class="score">100.0%</td></tr>
+              <tr><td class="rank">2</td><td>Fangio</td><td>1954</td><td class="score">100.0%</td></tr>
+              <tr><td class="rank">3</td><td>Fangio</td><td>1958</td><td class="score">100.0%</td></tr>
+              <tr><td class="rank">4</td><td>Button</td><td>2005</td><td class="score">100.0%</td></tr>
+              <tr><td class="rank">5</td><td>Hamilton</td><td>2016</td><td class="score">93.8%</td></tr>
+              <tr><td class="rank">6</td><td>Senna</td><td>1989</td><td class="score">92.9%</td></tr>
+              <tr><td class="rank">7</td><td>Verstappen</td><td>2022</td><td class="score">92.3%</td></tr>
+              <tr><td class="rank">8</td><td>Schumacher</td><td>2002</td><td class="score">91.7%</td></tr>
+              <tr><td class="rank">9</td><td>Hamilton</td><td>2020</td><td class="score">91.7%</td></tr>
+              <tr><td class="rank">10</td><td>Clark</td><td>1965</td><td class="score">90.0%</td></tr>
+            </tbody>
+          </table>
+          <p class="indicator__note">The dataset includes Indianapolis 500 results from 1950 to 1960, which counted toward the World Championship. Some early era perfect records reflect very small teammate samples from Indy only competitors rather than full season dominance. The table above excludes those entries and shows the most meaningful results.</p>
+        </div>
+
+        <!-- ── INDICATOR 7 ── -->
+        <div class="indicator">
+          <div class="indicator__header">
+            <span class="indicator__num">Indicator 7</span>
+            <h3 class="indicator__name">WAR — Wins Above Replacement</h3>
+          </div>
+          <code class="indicator__formula">WAR = driver_avg_finish − constructor_season_avg_finish</code>
+          <p class="indicator__desc">
+            Borrowed from baseball analytics. The core idea: what would a typical driver have scored in the same car? We calculate each constructor's average finishing position by season and then measure how much each driver exceeded or fell short of that baseline. Positive WAR means the driver finished better than their car would predict on average. This is one of the most heavily weighted indicators because it most aggressively strips out car performance from the result.
+          </p>
+          <table class="dpi-table">
+            <thead><tr><th>#</th><th>Driver</th><th>Season</th><th class="score">WAR (positions)</th></tr></thead>
+            <tbody>
+              <tr><td class="rank">1</td><td>Clark</td><td>1963</td><td class="score">+8.94</td></tr>
+              <tr><td class="rank">2</td><td>McLaren</td><td>1961</td><td class="score">+7.76</td></tr>
+              <tr><td class="rank">3</td><td>Hill</td><td>1962</td><td class="score">+7.56</td></tr>
+              <tr><td class="rank">4</td><td>Salvadori</td><td>1961</td><td class="score">+7.11</td></tr>
+              <tr><td class="rank">5</td><td>Gurney</td><td>1961</td><td class="score">+6.80</td></tr>
+              <tr><td class="rank">6</td><td>Peterson</td><td>1971</td><td class="score">+6.65</td></tr>
+              <tr><td class="rank">7</td><td>Fangio</td><td>1957</td><td class="score">+6.52</td></tr>
+              <tr><td class="rank">8</td><td>Clark</td><td>1961</td><td class="score">+6.17</td></tr>
+              <tr><td class="rank">9</td><td>Fittipaldi</td><td>1972</td><td class="score">+6.17</td></tr>
+              <tr><td class="rank">10</td><td>Moss</td><td>1961</td><td class="score">+6.15</td></tr>
+            </tbody>
+          </table>
+          <p class="indicator__note">The 1961 season appears four times because the Sharknose Ferrari was so dominant that any driver in non Ferrari machinery who finished well outperformed their constructor baseline by a wide margin. Clark's 1963 season in the Lotus 25 stands out as the single greatest car adjusted performance in the dataset.</p>
+        </div>
+
+        <!-- ── INDICATOR 8 ── -->
+        <div class="indicator">
+          <div class="indicator__header">
+            <span class="indicator__num">Indicator 8</span>
+            <h3 class="indicator__name">Field Dominance</h3>
+          </div>
+          <code class="indicator__formula">dominance_score = avg_finish_position_percentile</code>
+          <p class="indicator__desc">
+            Measures not just whether a driver won, but how thoroughly they dominated the field on average. A score of 1.0 means finishing first every race and 0.0 means finishing last every race. This differs from win rate because it captures the full distribution of results: a driver who finishes P2 every race scores very high even without winning. Weighted lower than other indicators because dominant margins reflect car advantage as much as driver skill.
+          </p>
+          <table class="dpi-table">
+            <thead><tr><th>#</th><th>Driver</th><th>Season</th><th class="score">Dominance</th></tr></thead>
+            <tbody>
+              <tr><td class="rank">1</td><td>Verstappen</td><td>2023</td><td class="score">98.6%</td></tr>
+              <tr><td class="rank">2</td><td>Schumacher</td><td>2002</td><td class="score">98.0%</td></tr>
+              <tr><td class="rank">3</td><td>Fangio</td><td>1954</td><td class="score">97.7%</td></tr>
+              <tr><td class="rank">4</td><td>Clark</td><td>1963</td><td class="score">95.7%</td></tr>
+              <tr><td class="rank">5</td><td>Hamilton</td><td>2020</td><td class="score">95.4%</td></tr>
+              <tr><td class="rank">6</td><td>Hamilton</td><td>2019</td><td class="score">92.7%</td></tr>
+              <tr><td class="rank">7</td><td>Vettel</td><td>2011</td><td class="score">92.4%</td></tr>
+              <tr><td class="rank">8</td><td>Vettel</td><td>2013</td><td class="score">92.2%</td></tr>
+              <tr><td class="rank">9</td><td>Hill</td><td>1961</td><td class="score">92.2%</td></tr>
+              <tr><td class="rank">10</td><td>Hamilton</td><td>2015</td><td class="score">91.7%</td></tr>
+            </tbody>
+          </table>
+        </div>
+
+        <!-- ── INDICATOR 9 ── -->
+        <div class="indicator">
+          <div class="indicator__header">
+            <span class="indicator__num">Indicator 9</span>
+            <h3 class="indicator__name">Consistency Index</h3>
+          </div>
+          <code class="indicator__formula">consistency = 1 / (CV + ε) &nbsp; where CV = std(finish_pct) / mean(finish_pct)</code>
+          <p class="indicator__desc">
+            Measures how predictable a driver's performance is race to race. We use the Coefficient of Variation (CV) of finishing position percentiles: standard deviation divided by the mean. CV normalizes for performance level so a front runner who varies between P1 and P3 can score the same as a midfield driver who varies between P8 and P10. Only races where the driver finished in the top 70% of the field are counted, preventing backmarkers from gaming the metric by being consistently slow.
+          </p>
+          <table class="dpi-table">
+            <thead><tr><th>#</th><th>Driver</th><th>Season</th><th class="score">Consistency</th></tr></thead>
+            <tbody>
+              <tr><td class="rank">1</td><td>Ascari</td><td>1952</td><td class="score">50.0</td></tr>
+              <tr><td class="rank">2</td><td>Schumacher</td><td>2002</td><td class="score">32.2</td></tr>
+              <tr><td class="rank">3</td><td>González</td><td>1951</td><td class="score">28.1</td></tr>
+              <tr><td class="rank">4</td><td>Hamilton</td><td>2014</td><td class="score">27.7</td></tr>
+              <tr><td class="rank">5</td><td>Surtees</td><td>1964</td><td class="score">27.4</td></tr>
+              <tr><td class="rank">6</td><td>Vettel</td><td>2011</td><td class="score">26.2</td></tr>
+              <tr><td class="rank">7</td><td>McLaren</td><td>1960</td><td class="score">24.0</td></tr>
+              <tr><td class="rank">8</td><td>Fangio</td><td>1954</td><td class="score">23.2</td></tr>
+              <tr><td class="rank">9</td><td>Berger</td><td>1991</td><td class="score">21.2</td></tr>
+            </tbody>
+          </table>
+          <p class="indicator__note">The score is capped at 50 to prevent infinity when variance is near zero. Ascari 1952 won 6 of 7 races and finished on the podium in the other, giving him a near zero coefficient of variation — a legitimately perfect season of consistency.</p>
+        </div>
+
+        <!-- ── INDICATOR 10 ── -->
+        <div class="indicator">
+          <div class="indicator__header">
+            <span class="indicator__num">Indicator 10</span>
+            <h3 class="indicator__name">Driver Fault DNF Rate</h3>
+          </div>
+          <code class="indicator__formula">clean_driving_score = 1 − (driver_fault_dnfs / races_entered)</code>
+          <p class="indicator__desc">
+            Captures error proneness: how often does a driver crash out due to their own mistakes versus mechanical failures beyond their control? Status codes classified as driver fault include Accident, Collision, Spun off, Collision damage, Stalled, and Fatal accident. Collisions are weighted at 0.5 since fault is often shared. The score is inverted so higher is better. Because many drivers complete full seasons without a single driver fault DNF, the career level average is a more meaningful comparison than any single season.
+          </p>
+          <table class="dpi-table">
+            <thead><tr><th>#</th><th>Driver</th><th>Career Avg</th></tr></thead>
+            <tbody>
+              <tr><td class="rank">1</td><td>Fangio</td><td class="score">98.3%</td></tr>
+              <tr><td class="rank">2</td><td>Jabouille</td><td class="score">98.0%</td></tr>
+              <tr><td class="rank">3</td><td>Salvadori</td><td class="score">98.0%</td></tr>
+              <tr><td class="rank">4</td><td>Gurney</td><td class="score">97.7%</td></tr>
+              <tr><td class="rank">5</td><td>Norris</td><td class="score">97.4%</td></tr>
+              <tr><td class="rank">6</td><td>Ricciardo</td><td class="score">97.3%</td></tr>
+              <tr><td class="rank">7</td><td>Clark</td><td class="score">97.3%</td></tr>
+              <tr><td class="rank">8</td><td>Moss</td><td class="score">97.3%</td></tr>
+              <tr><td class="rank">9</td><td>Ocon</td><td class="score">97.2%</td></tr>
+              <tr><td class="rank">10</td><td>Piastri</td><td class="score">97.2%</td></tr>
+            </tbody>
+          </table>
+          <p class="indicator__note">Career averages shown here require a minimum of 50 races to filter out drivers with short careers. Fangio's 98.3% across 66 races is remarkably clean for an era when racing was genuinely dangerous and mechanical failures were common.</p>
+        </div>
+
+        <!-- ── INDICATOR 11 ── -->
+        <div class="indicator">
+          <div class="indicator__header">
+            <span class="indicator__num">Indicator 11</span>
+            <h3 class="indicator__name">Championship Score</h3>
+          </div>
+          <code class="indicator__formula">championship_score = championship_pct × competitiveness_weight</code>
+          <p class="indicator__desc">
+            Championship position matters: it is what every driver races for. But not all championships are equal. A title won by 1 point in a season long fight is more impressive than a dominant wire to wire campaign. This indicator calculates where a driver finished in the standings as a percentile of the full field, then multiplies by a competitiveness weight based on how tight the P1 to P2 gap was at the end of the season.
+          </p>
+          <table class="dpi-table">
+            <thead><tr><th>#</th><th>Driver</th><th>Season</th><th class="score">Champ Score</th></tr></thead>
+            <tbody>
+              <tr><td class="rank">1</td><td>Norris</td><td>2025</td><td class="score">0.995</td></tr>
+              <tr><td class="rank">2</td><td>Lauda</td><td>1984</td><td class="score">0.993</td></tr>
+              <tr><td class="rank">3</td><td>Räikkönen</td><td>2007</td><td class="score">0.991</td></tr>
+              <tr><td class="rank">4</td><td>Hamilton</td><td>2008</td><td class="score">0.990</td></tr>
+              <tr><td class="rank">5</td><td>Vettel</td><td>2012</td><td class="score">0.989</td></tr>
+              <tr><td class="rank">6</td><td>Schumacher</td><td>1994</td><td class="score">0.989</td></tr>
+              <tr><td class="rank">7</td><td>Rosberg</td><td>2016</td><td class="score">0.987</td></tr>
+              <tr><td class="rank">8</td><td>Vettel</td><td>2010</td><td class="score">0.984</td></tr>
+              <tr><td class="rank">9</td><td>Piquet</td><td>1981</td><td class="score">0.980</td></tr>
+              <tr><td class="rank">10</td><td>Verstappen</td><td>2021</td><td class="score">0.980</td></tr>
+            </tbody>
+          </table>
+          <p class="indicator__note">These are the closest championship finishes where the eventual champion finished P1. Norris 2025 and Lauda's half point 1984 title sit at the top because the gap to P2 was razor thin relative to the total points available that season.</p>
+        </div>
+
+        <!-- ── INDICATOR 12 ── -->
+        <div class="indicator">
+          <div class="indicator__header">
+            <span class="indicator__num">Indicator 12</span>
+            <h3 class="indicator__name">Career Longevity</h3>
+          </div>
+          <code class="indicator__formula">longevity_score = races_weighted_avg(WAR) across full career</code>
+          <p class="indicator__desc">
+            Rewards sustained excellence over time. A driver who performs at an elite level for 15 seasons should score higher than an equally dominant driver who only competed for 5. Longevity is calculated as a races weighted average of WAR across all seasons: each season's contribution is proportional to how many races the driver ran that year. This separates great careers from great individual seasons.
+          </p>
+          <table class="dpi-table">
+            <thead><tr><th>#</th><th>Driver</th><th>Career Avg WAR</th></tr></thead>
+            <tbody>
+              <tr><td class="rank">1</td><td>McLaren</td><td class="score">+1.57</td></tr>
+              <tr><td class="rank">2</td><td>Verstappen</td><td class="score">+1.56</td></tr>
+              <tr><td class="rank">3</td><td>Gurney</td><td class="score">+1.48</td></tr>
+              <tr><td class="rank">4</td><td>Hill</td><td class="score">+1.45</td></tr>
+              <tr><td class="rank">5</td><td>Stewart</td><td class="score">+1.33</td></tr>
+              <tr><td class="rank">6</td><td>Prost</td><td class="score">+1.32</td></tr>
+              <tr><td class="rank">7</td><td>Piquet</td><td class="score">+1.28</td></tr>
+              <tr><td class="rank">8</td><td>Peterson</td><td class="score">+1.27</td></tr>
+              <tr><td class="rank">9</td><td>Fittipaldi</td><td class="score">+1.11</td></tr>
+              <tr><td class="rank">10</td><td>Salo</td><td class="score">+1.06</td></tr>
+            </tbody>
+          </table>
+          <p class="indicator__note">Minimum 80 career races. Bruce McLaren at the top is a genuine result: across his entire career he consistently outperformed the cars he drove, particularly in the early 1960s when Cooper was fading from competitiveness. Verstappen at 254 races maintaining a +1.56 average is the strongest modern result.</p>
+        </div>
+
+        <!-- ── INDICATOR 13 ── -->
+        <div class="indicator">
+          <div class="indicator__header">
+            <span class="indicator__num">Indicator 13</span>
+            <h3 class="indicator__name">Peak Performance Window</h3>
+          </div>
+          <code class="indicator__formula">peak_performance = best_3yr_rolling_avg(WAR)</code>
+          <p class="indicator__desc">
+            While longevity measures the full career arc, peak performance measures the absolute best stretch. We look at rolling 3 year windows of WAR scores and take the highest average. This captures drivers who may have had a shorter career but an absolutely dominant peak, which is central to the argument for Senna, Clark, or Rindt against drivers with longer but more uneven careers. The indicator rewards both height and consistency of a driver's best years rather than their career total.
+          </p>
+          <p class="indicator__note">Single season peak data is strongly influenced by Indianapolis 500 participants from the 1950s who only ran in Indianapolis (which counted toward the World Championship). Their results came from a very different race format with unusual field dynamics. The rolling 3 year window reduces but does not fully eliminate this effect for drivers who only competed in one or two seasons.</p>
+        </div>
+
+        <!-- ── INDICATOR 14 ── -->
+        <div class="indicator">
+          <div class="indicator__header">
+            <span class="indicator__num">Indicator 14</span>
+            <h3 class="indicator__name">Adaptability</h3>
+          </div>
+          <code class="indicator__formula">adaptability = (0.6 × early_h2h) + (0.4 × max(slope, 0))</code>
+          <p class="indicator__desc">
+            Measures how quickly a driver adapts when placed in a new environment, either after a team change or in a major regulation change year. For adaptation seasons, the driver's races are split into 5 race chunks and a linear regression is fit to their teammate H2H rate over time. The slope measures improvement. A driver who started poorly against their new teammate but improved rapidly scores higher than one who was immediately competitive but stagnant. Non adaptation seasons receive a neutral score of 0.5.
+          </p>
+          <table class="dpi-table">
+            <thead><tr><th>#</th><th>Driver</th><th>Season</th><th class="score">Adaptability</th></tr></thead>
+            <tbody>
+              <tr><td class="rank">1</td><td>Fangio</td><td>1957</td><td class="score">96.1%</td></tr>
+              <tr><td class="rank">2</td><td>Gurney</td><td>1961</td><td class="score">95.0%</td></tr>
+              <tr><td class="rank">3</td><td>Modena</td><td>1991</td><td class="score">93.8%</td></tr>
+              <tr><td class="rank">4</td><td>Hill</td><td>1994</td><td class="score">93.3%</td></tr>
+              <tr><td class="rank">5</td><td>Häkkinen</td><td>1999</td><td class="score">91.7%</td></tr>
+              <tr><td class="rank">6</td><td>Senna</td><td>1993</td><td class="score">90.5%</td></tr>
+              <tr><td class="rank">7</td><td>Schumacher</td><td>2000</td><td class="score">89.3%</td></tr>
+              <tr><td class="rank">8</td><td>Prost</td><td>1987</td><td class="score">88.6%</td></tr>
+              <tr><td class="rank">9</td><td>Alonso</td><td>2014</td><td class="score">87.5%</td></tr>
+              <tr><td class="rank">10</td><td>Hamilton</td><td>2013</td><td class="score">85.7%</td></tr>
+            </tbody>
+          </table>
+          <p class="indicator__note">Filtered to team change and regulation change seasons with at least 8 pairwise teammate comparisons, and excluding early era Indianapolis only competitors. Fangio's 1957 season at Maserati after leaving Ferrari is the top result: he dominated his teammates immediately in a team change year and never looked back.</p>
+        </div>
+
+        <!-- ── INDICATOR 15 ── -->
+        <div class="indicator">
+          <div class="indicator__header">
+            <span class="indicator__num">Indicator 15</span>
+            <h3 class="indicator__name">Grid to Finish Improvement</h3>
+          </div>
+          <code class="indicator__formula">grid_improvement = (grid_position − finish_position) / field_size</code>
+          <p class="indicator__desc">
+            How many positions does a driver gain from qualifying to the race finish, normalized by field size? A positive number means the driver finished ahead of where they started on average. This rewards racecraft: the ability to overtake, defend, and manage tyres better than qualifying pace would suggest. Most meaningful for drivers who consistently qualified outside their natural performance window.
+          </p>
+          <table class="dpi-table">
+            <thead><tr><th>#</th><th>Driver</th><th>Season</th><th class="score">Avg Gain</th></tr></thead>
+            <tbody>
+              <tr><td class="rank">1</td><td>Ginther</td><td>1964</td><td class="score">+20.3%</td></tr>
+              <tr><td class="rank">2</td><td>Pérez</td><td>2023</td><td class="score">+17.0%</td></tr>
+              <tr><td class="rank">3</td><td>Beltoise</td><td>1969</td><td class="score">+15.7%</td></tr>
+              <tr><td class="rank">4</td><td>Siffert</td><td>1965</td><td class="score">+13.9%</td></tr>
+              <tr><td class="rank">5</td><td>Heidfeld</td><td>2008</td><td class="score">+12.4%</td></tr>
+              <tr><td class="rank">6</td><td>Ocon</td><td>2022</td><td class="score">+12.4%</td></tr>
+              <tr><td class="rank">7</td><td>Barrichello</td><td>2005</td><td class="score">+11.6%</td></tr>
+              <tr><td class="rank">8</td><td>Schumacher</td><td>1999</td><td class="score">+11.2%</td></tr>
+              <tr><td class="rank">9</td><td>Hulme</td><td>1970</td><td class="score">+11.1%</td></tr>
+              <tr><td class="rank">10</td><td>Watson</td><td>1982</td><td class="score">+11.0%</td></tr>
+            </tbody>
+          </table>
+          <p class="indicator__note">Filtered to drivers with an average qualifying position of 12th or better and at least 10 races, so the table reflects genuine race craft rather than backmarkers who had nowhere to go but forward. Pérez 2023 is a notable modern result: despite being Verstappen's teammate and often struggling in qualifying, he consistently moved through the field on race day.</p>
+        </div>
+
+        <!-- ── INDICATOR 16 ── -->
+        <div class="indicator">
+          <div class="indicator__header">
+            <span class="indicator__num">Indicator 16</span>
+            <h3 class="indicator__name">Pole Position Rate</h3>
+          </div>
+          <code class="indicator__formula">pole_rate = poles / qualifying_sessions</code>
+          <p class="indicator__desc">
+            How often does a driver put the car on pole? Pole position reflects raw one lap pace and shows how often the driver was the fastest person on track on any given race weekend. Available from 1994 onward using qualifying data; estimated from race results for earlier seasons where qualifying records are incomplete.
+          </p>
+          <table class="dpi-table">
+            <thead><tr><th>#</th><th>Driver</th><th>Season</th><th class="score">Pole Rate</th></tr></thead>
+            <tbody>
+              <tr><td class="rank">1</td><td>Vettel</td><td>2011</td><td class="score">78.9%</td></tr>
+              <tr><td class="rank">2</td><td>Häkkinen</td><td>1998</td><td class="score">71.4%</td></tr>
+              <tr><td class="rank">3</td><td>Hamilton</td><td>2020</td><td class="score">62.5%</td></tr>
+              <tr><td class="rank">4</td><td>Villeneuve</td><td>1997</td><td class="score">60.0%</td></tr>
+              <tr><td class="rank">5</td><td>Verstappen</td><td>2023</td><td class="score">59.1%</td></tr>
+              <tr><td class="rank">6</td><td>Hamilton</td><td>2015</td><td class="score">57.9%</td></tr>
+              <tr><td class="rank">7</td><td>Rosberg</td><td>2014</td><td class="score">57.9%</td></tr>
+              <tr><td class="rank">8</td><td>Hill</td><td>1996</td><td class="score">57.1%</td></tr>
+              <tr><td class="rank">9</td><td>Hamilton</td><td>2016</td><td class="score">57.1%</td></tr>
+              <tr><td class="rank">10</td><td>Hamilton</td><td>2017</td><td class="score">55.0%</td></tr>
+            </tbody>
+          </table>
+        </div>
+
+        <hr class="section-divider" />
+
+        <h2>Final DPI: Top 25 All Time</h2>
+
+        <p>
+          Each driver's season DPIs are combined into a career score using a Bayesian estimate: seasons are weighted by races entered and drivers with fewer seasons are pulled toward the population average. The confidence intervals come from 1,000 bootstrap simulations. Where intervals overlap, the ranking difference is not statistically meaningful.
+        </p>
+
+        <p class="tier-label">Tier 1 — Statistically Inseparable at the top (overlapping CIs)</p>
+
+        <div class="final-table-wrap">
+          <table class="final-table">
+            <thead>
+              <tr>
+                <th>#</th>
+                <th>Driver</th>
+                <th>Seasons</th>
+                <th>Races</th>
+                <th>Peak Season</th>
+                <th class="f-dpi">Career DPI</th>
+                <th class="f-ci">95% CI</th>
+              </tr>
+            </thead>
+            <tbody>
+              <tr><td class="f-rank">1</td><td>Verstappen</td><td>12</td><td>254</td><td>2023</td><td class="f-dpi">161.5</td><td class="f-ci">137.1 to 182.9</td></tr>
+              <tr><td class="f-rank">2</td><td>Senna</td><td>11</td><td>161</td><td>1991</td><td class="f-dpi">155.6</td><td class="f-ci">142.0 to 169.7</td></tr>
+              <tr><td class="f-rank">3</td><td>Hamilton</td><td>19</td><td>380</td><td>2018</td><td class="f-dpi">153.5</td><td class="f-ci">138.2 to 169.8</td></tr>
+              <tr><td class="f-rank">4</td><td>Schumacher</td><td>20</td><td>314</td><td>2002</td><td class="f-dpi">150.5</td><td class="f-ci">130.4 to 168.3</td></tr>
+              <tr><td class="f-rank">5</td><td>Prost</td><td>13</td><td>202</td><td>1993</td><td class="f-dpi">150.4</td><td class="f-ci">138.0 to 161.3</td></tr>
+              <tr class="tier-break"><td class="f-rank">6</td><td>Clark</td><td>11</td><td>92</td><td>1963</td><td class="f-dpi">147.1</td><td class="f-ci">129.6 to 165.8</td></tr>
+              <tr><td class="f-rank">7</td><td>Fangio</td><td>9</td><td>66</td><td>1954</td><td class="f-dpi">144.1</td><td class="f-ci">133.8 to 154.0</td></tr>
+              <tr><td class="f-rank">8</td><td>Stewart</td><td>9</td><td>100</td><td>1971</td><td class="f-dpi">140.5</td><td class="f-ci">122.9 to 157.8</td></tr>
+              <tr><td class="f-rank">9</td><td>Vettel</td><td>17</td><td>308</td><td>2013</td><td class="f-dpi">139.8</td><td class="f-ci">119.9 to 159.7</td></tr>
+              <tr class="tier-break"><td class="f-rank">10</td><td>Alonso</td><td>22</td><td>428</td><td>2006</td><td class="f-dpi">131.9</td><td class="f-ci">118.8 to 146.1</td></tr>
+              <tr><td class="f-rank">11</td><td>Häkkinen</td><td>11</td><td>163</td><td>1998</td><td class="f-dpi">130.5</td><td class="f-ci">113.0 to 151.2</td></tr>
+              <tr><td class="f-rank">12</td><td>Hill</td><td>8</td><td>116</td><td>1994</td><td class="f-dpi">130.1</td><td class="f-ci">103.9 to 153.4</td></tr>
+              <tr><td class="f-rank">13</td><td>Norris</td><td>7</td><td>152</td><td>2025</td><td class="f-dpi">129.8</td><td class="f-ci">106.7 to 151.9</td></tr>
+              <tr><td class="f-rank">14</td><td>Moss</td><td>18</td><td>123</td><td>1958</td><td class="f-dpi">126.8</td><td class="f-ci">116.6 to 135.5</td></tr>
+              <tr><td class="f-rank">15</td><td>Piquet</td><td>17</td><td>230</td><td>1987</td><td class="f-dpi">126.4</td><td class="f-ci">114.1 to 139.0</td></tr>
+              <tr><td class="f-rank">16</td><td>Lauda</td><td>14</td><td>187</td><td>1975</td><td class="f-dpi">125.2</td><td class="f-ci">—</td></tr>
+              <tr><td class="f-rank">17</td><td>Scheckter</td><td>9</td><td>112</td><td>1976</td><td class="f-dpi">125.0</td><td class="f-ci">—</td></tr>
+              <tr><td class="f-rank">18</td><td>Hunt</td><td>7</td><td>93</td><td>1976</td><td class="f-dpi">124.1</td><td class="f-ci">—</td></tr>
+              <tr><td class="f-rank">19</td><td>Rosberg</td><td>11</td><td>206</td><td>2016</td><td class="f-dpi">123.9</td><td class="f-ci">—</td></tr>
+              <tr><td class="f-rank">20</td><td>Mansell</td><td>15</td><td>190</td><td>1992</td><td class="f-dpi">123.5</td><td class="f-ci">—</td></tr>
+              <tr><td class="f-rank">21</td><td>Fittipaldi</td><td>12</td><td>156</td><td>1972</td><td class="f-dpi">123.5</td><td class="f-ci">—</td></tr>
+              <tr><td class="f-rank">22</td><td>Ascari</td><td>8</td><td>46</td><td>1952</td><td class="f-dpi">122.7</td><td class="f-ci">—</td></tr>
+              <tr><td class="f-rank">23</td><td>Leclerc</td><td>8</td><td>173</td><td>2022</td><td class="f-dpi">121.8</td><td class="f-ci">—</td></tr>
+              <tr><td class="f-rank">24</td><td>Farina</td><td>6</td><td>37</td><td>1950</td><td class="f-dpi">118.0</td><td class="f-ci">—</td></tr>
+              <tr><td class="f-rank">25</td><td>Hulme</td><td>13</td><td>145</td><td>1968</td><td class="f-dpi">117.6</td><td class="f-ci">—</td></tr>
+            </tbody>
+          </table>
+        </div>
+
+        <hr class="section-divider" />
+
+        <h2>The Answer: We Don't Know</h2>
+
+        <p>
+          Max Verstappen sits at number one by DPI. But the bootstrap confidence intervals mean the correct headline isn't "Verstappen is the greatest F1 driver of all time." It is that Verstappen, Senna, Hamilton, Schumacher, and Prost are all operating in a tier of their own, and we don't have enough data to separate them with statistical confidence. All five of their intervals overlap.
+        </p>
+
+        <p>
+          I find that more interesting than a clean answer would be. It is what the data actually says.
+        </p>
+
+        <h2>What I Would Do Differently</h2>
+
+        <p>
+          The biggest limitation is data availability before 1994. Qualifying data only starts then, which means Indicators 4, 5, and 16 are missing for the sport's first four decades. Drivers from the 1950s and 60s are being evaluated on fewer indicators than modern drivers, which creates a real gap in the comparison.
+        </p>
+
+        <p>
+          I would also love to add race pace telemetry if it ever becomes accessible. The gap between a driver's fastest lap and their average race lap is a much cleaner measure of pace than what is currently available. And eventually I want to run the PCA weighted DPI through the same bootstrap test to see if those confidence intervals are tighter or wider, which would tell us something interesting about which weighting method is more stable.
+        </p>
+
+        <p>
+          For now, the index lives in a local PostgreSQL database and updates at the end of each season. The full Jupyter notebook walks through every step of the methodology in detail. Thanks for reading, and if you have thoughts on the methodology or disagree with any of the indicator choices, reach out.
+        </p>
+
+        <p>
+          <a href="https://github.com/nsumnicht/projects/blob/main/f1/notebooks/01_dpi_analysis.ipynb" target="_blank" rel="noopener">View the full analysis notebook on GitHub →</a>
+        </p>
+
+      </article>
+
+      <footer class="post__footer">
+        <a href="../blog.html" class="post__back">← Back to all posts</a>
+      </footer>
+
+    </div>
+  </main>
+
+  <footer class="footer">
+    <div class="container footer__inner">
+      <p class="footer__name">Nick Sumnicht</p>
+      <p class="footer__note">Built with HTML, CSS, and JavaScript. No frameworks were harmed.</p>
+      <p class="footer__copy">&copy; <span id="footer-year"></span></p>
+    </div>
+  </footer>
+
+  <script src="../js/script.js"></script>
+  <script src="https://cdnjs.cloudflare.com/ajax/libs/highlight.js/11.9.0/highlight.min.js"></script>
+  <script>hljs.highlightAll();</script>
+</body>
+</html>
