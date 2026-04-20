@@ -215,6 +215,24 @@ z_shrunk = w * z_observed
           I ran 1,000 bootstrap simulations per driver: randomly resampling their season DPIs with replacement and recalculating career scores each time to generate 95% confidence intervals. If two drivers' ranges overlap, we cannot confidently say one is better than the other.
         </p>
 
+        <h2>Quality-Weighted H2H: An Iterative Correction</h2>
+
+        <p>
+          The initial DPI treated all teammate H2H comparisons equally. Verstappen outperforming Pérez and Hamilton outperforming Alonso contributed the same amount to their scores, which is methodologically weak. Beating a historically great teammate should count for more than beating a backmarker.
+        </p>
+
+        <p>
+          The fix uses an iterative approach borrowed from Elo ratings in chess: your rating gain depends on who you beat, not just that you won. Each driver is assigned a quality multiplier based on their current career DPI relative to the field average. That multiplier scales the H2H indicator values for every driver who faced them as a teammate. The updated DPIs then become the new quality weights for the next iteration, and the process repeats until the scores stop moving. In this dataset it converged in four iterations. We also ran a sensitivity analysis on the minimum weight floor (0.25, 0.35, 0.45, and 0.50) — all four values produced the same final rankings, which is a good sign that the result is not sensitive to that design choice.
+        </p>
+
+        <p>
+          The effect was meaningful. Verstappen dropped from first to sixth. His H2H record, while dominant, was built largely against teammates like Pérez, Gasly, and Lawson, none of whom score highly in the final DPI. Senna's H2H record, by contrast, includes sustained head to head competition against Prost at McLaren, arguably the strongest intra-team rivalry in F1 history. When you weight those wins by opponent quality, Senna moves to the top.
+        </p>
+
+        <p>
+          Fangio also moved significantly, from seventh to second. Across five different constructors and five championships, he consistently dominated teammates at competitive teams, several of whom were genuinely strong drivers. The quality weighting rewarded that history in a way the raw H2H scores did not.
+        </p>
+
         <hr class="section-divider" />
 
         <h2>The 16 Indicators</h2>
@@ -657,7 +675,7 @@ z_shrunk = w * z_observed
           Each driver's season DPIs are combined into a career score using a Bayesian estimate: seasons are weighted by races entered and drivers with fewer seasons are pulled toward the population average. The confidence intervals come from 1,000 bootstrap simulations. Where intervals overlap, the ranking difference is not statistically meaningful.
         </p>
 
-        <p class="tier-label">Tier 1 — Statistically Inseparable at the top (overlapping CIs)</p>
+        <p class="tier-label">Tier 1 — Statistically inseparable at the top (overlapping CIs)</p>
 
         <div class="final-table-wrap">
           <table class="final-table">
@@ -673,31 +691,31 @@ z_shrunk = w * z_observed
               </tr>
             </thead>
             <tbody>
-              <tr><td class="f-rank">1</td><td>Verstappen</td><td>12</td><td>254</td><td>2023</td><td class="f-dpi">161.5</td><td class="f-ci">137.1 to 182.9</td></tr>
-              <tr><td class="f-rank">2</td><td>Senna</td><td>11</td><td>161</td><td>1991</td><td class="f-dpi">155.6</td><td class="f-ci">142.0 to 169.7</td></tr>
-              <tr><td class="f-rank">3</td><td>Hamilton</td><td>19</td><td>380</td><td>2018</td><td class="f-dpi">153.5</td><td class="f-ci">138.2 to 169.8</td></tr>
-              <tr><td class="f-rank">4</td><td>Schumacher</td><td>20</td><td>314</td><td>2002</td><td class="f-dpi">150.5</td><td class="f-ci">130.4 to 168.3</td></tr>
-              <tr><td class="f-rank">5</td><td>Prost</td><td>13</td><td>202</td><td>1993</td><td class="f-dpi">150.4</td><td class="f-ci">138.0 to 161.3</td></tr>
-              <tr class="tier-break"><td class="f-rank">6</td><td>Clark</td><td>11</td><td>92</td><td>1963</td><td class="f-dpi">147.1</td><td class="f-ci">129.6 to 165.8</td></tr>
-              <tr><td class="f-rank">7</td><td>Fangio</td><td>9</td><td>66</td><td>1954</td><td class="f-dpi">144.1</td><td class="f-ci">133.8 to 154.0</td></tr>
-              <tr><td class="f-rank">8</td><td>Stewart</td><td>9</td><td>100</td><td>1971</td><td class="f-dpi">140.5</td><td class="f-ci">122.9 to 157.8</td></tr>
-              <tr><td class="f-rank">9</td><td>Vettel</td><td>17</td><td>308</td><td>2013</td><td class="f-dpi">139.8</td><td class="f-ci">119.9 to 159.7</td></tr>
-              <tr class="tier-break"><td class="f-rank">10</td><td>Alonso</td><td>22</td><td>428</td><td>2006</td><td class="f-dpi">131.9</td><td class="f-ci">118.8 to 146.1</td></tr>
-              <tr><td class="f-rank">11</td><td>Häkkinen</td><td>11</td><td>163</td><td>1998</td><td class="f-dpi">130.5</td><td class="f-ci">113.0 to 151.2</td></tr>
-              <tr><td class="f-rank">12</td><td>Hill</td><td>8</td><td>116</td><td>1994</td><td class="f-dpi">130.1</td><td class="f-ci">103.9 to 153.4</td></tr>
-              <tr><td class="f-rank">13</td><td>Norris</td><td>7</td><td>152</td><td>2025</td><td class="f-dpi">129.8</td><td class="f-ci">106.7 to 151.9</td></tr>
-              <tr><td class="f-rank">14</td><td>Moss</td><td>18</td><td>123</td><td>1958</td><td class="f-dpi">126.8</td><td class="f-ci">116.6 to 135.5</td></tr>
-              <tr><td class="f-rank">15</td><td>Piquet</td><td>17</td><td>230</td><td>1987</td><td class="f-dpi">126.4</td><td class="f-ci">114.1 to 139.0</td></tr>
-              <tr><td class="f-rank">16</td><td>Lauda</td><td>14</td><td>187</td><td>1975</td><td class="f-dpi">125.2</td><td class="f-ci">—</td></tr>
-              <tr><td class="f-rank">17</td><td>Scheckter</td><td>9</td><td>112</td><td>1976</td><td class="f-dpi">125.0</td><td class="f-ci">—</td></tr>
-              <tr><td class="f-rank">18</td><td>Hunt</td><td>7</td><td>93</td><td>1976</td><td class="f-dpi">124.1</td><td class="f-ci">—</td></tr>
-              <tr><td class="f-rank">19</td><td>Rosberg</td><td>11</td><td>206</td><td>2016</td><td class="f-dpi">123.9</td><td class="f-ci">—</td></tr>
-              <tr><td class="f-rank">20</td><td>Mansell</td><td>15</td><td>190</td><td>1992</td><td class="f-dpi">123.5</td><td class="f-ci">—</td></tr>
-              <tr><td class="f-rank">21</td><td>Fittipaldi</td><td>12</td><td>156</td><td>1972</td><td class="f-dpi">123.5</td><td class="f-ci">—</td></tr>
-              <tr><td class="f-rank">22</td><td>Ascari</td><td>8</td><td>46</td><td>1952</td><td class="f-dpi">122.7</td><td class="f-ci">—</td></tr>
-              <tr><td class="f-rank">23</td><td>Leclerc</td><td>8</td><td>173</td><td>2022</td><td class="f-dpi">121.8</td><td class="f-ci">—</td></tr>
-              <tr><td class="f-rank">24</td><td>Farina</td><td>6</td><td>37</td><td>1950</td><td class="f-dpi">118.0</td><td class="f-ci">—</td></tr>
-              <tr><td class="f-rank">25</td><td>Hulme</td><td>13</td><td>145</td><td>1968</td><td class="f-dpi">117.6</td><td class="f-ci">—</td></tr>
+              <tr><td class="f-rank">1</td><td>Senna</td><td>11</td><td>161</td><td>1991</td><td class="f-dpi">162.6</td><td class="f-ci">143.4 to 183.7</td></tr>
+              <tr><td class="f-rank">2</td><td>Fangio</td><td>9</td><td>66</td><td>1954</td><td class="f-dpi">159.3</td><td class="f-ci">151.3 to 166.4</td></tr>
+              <tr><td class="f-rank">3</td><td>Hamilton</td><td>19</td><td>380</td><td>2018</td><td class="f-dpi">158.8</td><td class="f-ci">141.6 to 175.5</td></tr>
+              <tr><td class="f-rank">4</td><td>Prost</td><td>13</td><td>202</td><td>1993</td><td class="f-dpi">158.3</td><td class="f-ci">144.8 to 169.6</td></tr>
+              <tr><td class="f-rank">5</td><td>Schumacher</td><td>20</td><td>314</td><td>2002</td><td class="f-dpi">152.9</td><td class="f-ci">131.4 to 173.2</td></tr>
+              <tr><td class="f-rank">6</td><td>Verstappen</td><td>12</td><td>254</td><td>2023</td><td class="f-dpi">152.2</td><td class="f-ci">133.6 to 172.3</td></tr>
+              <tr class="tier-break"><td class="f-rank">7</td><td>Clark</td><td>11</td><td>92</td><td>1963</td><td class="f-dpi">146.0</td><td class="f-ci">134.3 to 159.6</td></tr>
+              <tr><td class="f-rank">8</td><td>Stewart</td><td>9</td><td>100</td><td>1971</td><td class="f-dpi">144.7</td><td class="f-ci">125.5 to 163.9</td></tr>
+              <tr class="tier-break"><td class="f-rank">9</td><td>Alonso</td><td>22</td><td>428</td><td>2006</td><td class="f-dpi">136.7</td><td class="f-ci">123.7 to 150.4</td></tr>
+              <tr><td class="f-rank">10</td><td>Hunt</td><td>7</td><td>93</td><td>1976</td><td class="f-dpi">136.5</td><td class="f-ci">100.7 to 169.9</td></tr>
+              <tr><td class="f-rank">11</td><td>Vettel</td><td>17</td><td>308</td><td>2013</td><td class="f-dpi">136.4</td><td class="f-ci">117.7 to 155.6</td></tr>
+              <tr><td class="f-rank">12</td><td>Norris</td><td>7</td><td>152</td><td>2025</td><td class="f-dpi">135.0</td><td class="f-ci">107.1 to 163.3</td></tr>
+              <tr><td class="f-rank">13</td><td>Scheckter</td><td>9</td><td>112</td><td>1979</td><td class="f-dpi">134.9</td><td class="f-ci">116.9 to 149.3</td></tr>
+              <tr><td class="f-rank">14</td><td>Hill</td><td>8</td><td>116</td><td>1994</td><td class="f-dpi">133.4</td><td class="f-ci">104.8 to 162.7</td></tr>
+              <tr><td class="f-rank">15</td><td>Moss</td><td>18</td><td>123</td><td>1958</td><td class="f-dpi">131.7</td><td class="f-ci">126.9 to 136.2</td></tr>
+              <tr><td class="f-rank">16</td><td>Häkkinen</td><td>11</td><td>163</td><td>1998</td><td class="f-dpi">130.5</td><td class="f-ci">112.0 to 149.2</td></tr>
+              <tr><td class="f-rank">17</td><td>Fittipaldi</td><td>12</td><td>156</td><td>1972</td><td class="f-dpi">128.4</td><td class="f-ci">112.6 to 144.9</td></tr>
+              <tr><td class="f-rank">18</td><td>Rosberg</td><td>11</td><td>206</td><td>2016</td><td class="f-dpi">126.2</td><td class="f-ci">112.1 to 140.3</td></tr>
+              <tr><td class="f-rank">19</td><td>Leclerc</td><td>8</td><td>173</td><td>2022</td><td class="f-dpi">126.1</td><td class="f-ci">107.5 to 143.6</td></tr>
+              <tr><td class="f-rank">20</td><td>Mansell</td><td>15</td><td>190</td><td>1992</td><td class="f-dpi">125.0</td><td class="f-ci">104.7 to 147.2</td></tr>
+              <tr><td class="f-rank">21</td><td>Andretti</td><td>14</td><td>128</td><td>1978</td><td class="f-dpi">122.9</td><td class="f-ci">97.9 to 148.3</td></tr>
+              <tr><td class="f-rank">22</td><td>Hulme</td><td>13</td><td>145</td><td>1968</td><td class="f-dpi">122.1</td><td class="f-ci">119.1 to 124.6</td></tr>
+              <tr><td class="f-rank">23</td><td>Rindt</td><td>7</td><td>60</td><td>1970</td><td class="f-dpi">120.8</td><td class="f-ci">102.9 to 140.3</td></tr>
+              <tr><td class="f-rank">24</td><td>Laffite</td><td>13</td><td>176</td><td>1979</td><td class="f-dpi">120.3</td><td class="f-ci">107.9 to 133.5</td></tr>
+              <tr><td class="f-rank">25</td><td>Farina</td><td>6</td><td>37</td><td>1950</td><td class="f-dpi">120.1</td><td class="f-ci">112.7 to 128.1</td></tr>
             </tbody>
           </table>
         </div>
@@ -707,7 +725,11 @@ z_shrunk = w * z_observed
         <h2>The Answer: We Don't Know</h2>
 
         <p>
-          Max Verstappen sits at number one by DPI. But the bootstrap confidence intervals mean the correct headline isn't "Verstappen is the greatest F1 driver of all time." It is that Verstappen, Senna, Hamilton, Schumacher, and Prost are all operating in a tier of their own, and we don't have enough data to separate them with statistical confidence. All five of their intervals overlap.
+          Ayrton Senna sits at number one by DPI. But the correct headline is not "Senna is the greatest F1 driver of all time." The top six — Senna, Fangio, Hamilton, Prost, Schumacher, and Verstappen — all have overlapping 95% confidence intervals. We cannot statistically separate them. They are operating in a tier of their own, and the data does not give us enough precision to order them definitively.
+        </p>
+
+        <p>
+          Verstappen's drop from first to sixth after quality-weighted H2H is the most notable single movement in the index. It is not a knock on his ability. It is a statement about his competition. He has been dominant in ways that are genuinely historic, but his H2H record has not yet included the kind of elite intra-team rivalry — a Prost, an Alonso in equal machinery — that would cement his advantage over drivers like Senna or Fangio. If he spends a few seasons against a teammate of that caliber, this ranking could shift again.
         </p>
 
         <p>
